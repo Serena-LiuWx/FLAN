@@ -19,7 +19,7 @@ from typing import Optional
 
 import numpy as np
 
-from flan import templates
+import templates
 
 
 def is_classification(flan_pattern_name: str):
