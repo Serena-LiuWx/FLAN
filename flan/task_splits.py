@@ -21,8 +21,8 @@ from typing import List, Mapping, Optional, Sequence, Set
 import numpy as np
 import seqio
 
-from flan import few_shot
-from flan import tasks as flan_tasks  # pylint: disable=unused-import
+import few_shot
+import tasks as flan_tasks  # pylint: disable=unused-import
 
 ShotConfig = few_shot.ShotConfig
 
@@ -134,6 +134,12 @@ _DEFAULT_TASK_CLUSTERS_ABBREV = collections.OrderedDict([
     ])
 ])
 
+_TEST_TASK_CLUSTERS_ABBREV = collections.OrderedDict([
+    ('test_data', [
+        'bool_q',
+    ])
+])
+
 _SUPERGLUE_TASKS = frozenset(
     {'bool_q', 'cb', 'copa', 'multirc', 'record', 'rte', 'wic', 'wsc'})
 
@@ -178,6 +184,48 @@ def _get_default_task_collapse_map(
       collapse_map[task_full_name] = collapsed_task_full_name
   return collapse_map
 
+
+def _get_test_task_clusters(
+    num_templates: int,
+    shot_config: ShotConfig,
+    exclude_missing_tasks: bool = False,
+) -> collections.OrderedDict:
+  """Returns a dict of task clusters.
+
+  Args:
+    num_templates: number of templates per task.
+    shot_config: specifies how many shots.
+    exclude_missing_tasks: if True, any task that has not been included in
+      templates.py:PATTERNS will be excluded from the returned clusters. If
+        False, this function will throw an error for any requested task that has
+        not been included in templates.py:PATTERNS.
+
+  Returns:
+    An OrderedDict, where each key is a cluster name and each value is a list of
+    task names. Note that a task may appear in multiple clusters.
+  """
+  # Convert abbreviated task names to full names.
+  task_clusters = collections.OrderedDict()
+
+  for cluster_name, abbrev_task_names in _TEST_TASK_CLUSTERS_ABBREV.items():
+    full_names = []
+
+    for abbrev_name in abbrev_task_names:
+      full_name = full_task_name(abbrev_name, num_templates, shot_config)
+      try:
+        seqio.TaskRegistry.get(full_name)
+      except ValueError:
+        if exclude_missing_tasks:
+          continue
+        else:
+          raise ValueError(f'No task defined for {full_name}.')
+      full_names.append(full_name)
+
+      if not full_names:
+        continue  # If all tasks in a cluster are missing, exclude the cluster.
+      task_clusters[cluster_name] = full_names
+
+  return task_clusters
 
 def collapse_related_tasks(tasks: Sequence[str],
                            collapse_map: Mapping[str, str]) -> List[str]:
@@ -647,6 +695,35 @@ def generate_inter_cluster_splits(
         train_tasks=train_tasks,
         test_tasks=set(test_tasks),
         handle_overlap='remove')
+    task_splits.append(task_split)
+
+  return task_splits
+
+# QwQ: a special test that only contains bool_q
+def generate_test_cluster_splits(
+    num_templates: int = 10,
+    shot_config: ShotConfig = ShotConfig.ZERO) -> List[TaskSplit]:
+  """Generates inter-cluster splits of test."""
+  task_clusters = _get_test_task_clusters(num_templates, shot_config)
+  
+  task_splits = []
+  # 0 ('test_data', ['bool_q_10templates'])
+  for test_cluster_idx, (test_cluster_name,
+                         test_tasks) in enumerate(task_clusters.items()):
+    train_tasks = set()
+    for cluster_name, cluster_tasks in task_clusters.items():
+      train_tasks.update(cluster_tasks)
+
+    # Because some tasks are a member of multiple clusters, a task could be in
+    # both the test cluster and a train cluster. We therefore pass
+    # handle_overlap='remove' to prune such tasks from train, leaving them only
+    # in test.
+    task_split = TaskSplit(
+        name=f'flan_test_cluster_split_{test_cluster_idx}' +
+        f'_{num_templates}templates' + shot_config.name_suffix,
+        train_tasks=train_tasks,
+        test_tasks=set(test_tasks),
+        handle_overlap='allow')
     task_splits.append(task_split)
 
   return task_splits
