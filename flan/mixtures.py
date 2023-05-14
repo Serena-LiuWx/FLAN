@@ -21,6 +21,7 @@ import few_shot
 import task_splits
 import tasks  # pylint: disable=unused-import
 import templates  # pylint: disable=unused-import
+import json
 
 mixing_rate_3k = functools.partial(seqio.mixing_rate_num_examples, maximum=3000)
 
@@ -86,12 +87,15 @@ for split in all_splits:
     # If you would like to take min(1 epoch, NUM_SAMPLES) then use dataset.take(NUM_SAMPLES)
     # Or if you would like to gather a full epoch, simply `enumerate(dataset)` until completion.
     for i, ex in enumerate(dataset.take(NUM_SAMPLES)):
-        source_counter[ex["_task_source"].numpy()] += 1
+        #source_counter[ex["_task_source"].numpy()] += 1
         save_data.append((ex["inputs_pretokenized"].numpy().decode(),
                         ex["targets_pretokenized"].numpy().decode()))
 
-    print(f"Data Submixture Counts: {source_counter}")
+    #print(f"Data Submixture Counts: {source_counter}")
 
-    print(save_data)
-    # with open('output_test.txt', 'w') as file:
-    #     file.write(str(save_data))
+    # print(save_data)
+    with open('output_test.json', 'w') as f:
+      for d in save_data:
+        json.dump(d, f)
+        f.write('\n')
+    
