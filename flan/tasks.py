@@ -24,13 +24,13 @@ from t5.data import postprocessors as t5_post
 from t5.evaluation import metrics as t5_metrics
 import tensorflow.compat.v1 as tf
 
-from flan import baseline_templates
-from flan import few_shot
-from flan import metrics as gm_metrics
-from flan import postprocessors
-from flan import preprocessors
-from flan import templates
-from flan import utils
+import baseline_templates
+import few_shot
+import metrics as gm_metrics
+import postprocessors
+import preprocessors
+import templates
+import utils
 
 ShotConfig = few_shot.ShotConfig
 
@@ -1828,7 +1828,7 @@ def _process_cola(example):
 
 TASK_CONFIGS['cola'] = _TaskConfig(
     source=seqio.TfdsDataSource(
-        tfds_name='glue/cola',
+        tfds_name='glue/cola:1.0.0',
         splits={
             'train': f'train[:-{NUM_VAL_EXAMPLES}]',
             'validation': f'train[-{NUM_VAL_EXAMPLES}:]',
