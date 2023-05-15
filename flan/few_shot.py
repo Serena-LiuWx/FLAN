@@ -20,7 +20,7 @@ from typing import Optional
 import seqio
 import tensorflow as tf
 
-from flan import preprocessors as flan_prep
+import preprocessors as flan_prep
 
 
 class ShotConfig(enum.Enum):
