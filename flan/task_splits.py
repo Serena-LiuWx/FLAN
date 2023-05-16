@@ -39,6 +39,7 @@ _TASKS_PER_CLUSTER_LIST = [1, 2, 3, 4]
 
 # Define task clusters using abbreviated task names. These abbreviated names
 # correspond to keys in templates.py:PATTERNS
+'''
 _DEFAULT_TASK_CLUSTERS_ABBREV = collections.OrderedDict([
     ('summarization', [
         'aeslc',
@@ -130,6 +131,56 @@ _DEFAULT_TASK_CLUSTERS_ABBREV = collections.OrderedDict([
         'trec',
     ]), ('read_comp_and_common_sense', [
         'record',
+        'cosmos_qa',
+    ])
+])
+'''
+
+_DEFAULT_TASK_CLUSTERS_ABBREV = collections.OrderedDict([
+    ('summarization', [
+        'cnn_dailymail',
+        'gigaword',
+        'multi_news',
+        'ag_news_subset',
+    ]), ('structure_to_text', [
+        'dart',
+    ]),
+    ('reading_comprehension', [
+        'drop',
+        'openbookqa',
+        'bool_q',
+    ]),
+    ('open_domain_qa', [
+        'trivia_qa',
+    ]), ('paraphrase', [
+        'glue_mrpc',
+        'paws_wiki',
+    ]),
+    ('sentiment', [
+        'imdb_reviews',
+        'sentiment140',
+        'yelp_polarity_reviews',
+    ]), ('text_formatting', [
+    ]), ('common_sense', [
+        'hellaswag',
+        'piqa',
+    ]),
+    ('translation', [
+    ]), ('coreference', [
+        'definite_pronoun_resolution',
+    ]),
+    ('entailment', [
+        'snli',
+    ]), ('math', [
+        'math_dataset',
+    ]), ('conversational_qa', [
+        'quac',
+        'coqa',
+    ]), ('word_disambiguation', [
+    ]), ('linguistic_acceptability', [
+    ]), ('question_classification', [
+        'trec',
+    ]), ('read_comp_and_common_sense', [
         'cosmos_qa',
     ])
 ])
