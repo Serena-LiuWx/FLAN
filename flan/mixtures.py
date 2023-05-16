@@ -28,11 +28,11 @@ mixing_rate_3k = functools.partial(seqio.mixing_rate_num_examples, maximum=3000)
 all_splits = []
 
 shot_config = few_shot.ShotConfig.ZERO
-
+'''
 # Add inter cluster splits.
 all_splits += task_splits.generate_inter_cluster_splits(
     shot_config=shot_config)
-'''
+
 # Add intra cluster splits.
 all_splits += task_splits.generate_intra_cluster_splits(
     shot_config=shot_config)
@@ -57,6 +57,10 @@ all_splits += task_splits.generate_inter_ablation(shot_config=shot_config)
 all_splits = task_splits.generate_test_cluster_splits()
 '''
 
+# Add my inter cluster splits.
+all_splits += task_splits.generate_my_inter_ablation(
+    shot_config=shot_config)
+
 for split in all_splits:
   seqio.MixtureRegistry.add(
       name=split.train_mixture_name,
@@ -66,6 +70,10 @@ for split in all_splits:
       name=split.eval_mixture_name,
       tasks=split.test_tasks,
       default_rate=seqio.mixing_rate_num_examples)
+
+for split in all_splits:
+  print(split.train_mixture_name)
+
 
 # to get all the data from splits
 for split in all_splits:
@@ -119,4 +127,3 @@ for split in all_splits:
       for d in save_data_eval:
         json.dump(d, f)
         f.write('\n')
-    
