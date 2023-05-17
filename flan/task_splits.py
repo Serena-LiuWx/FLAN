@@ -778,3 +778,94 @@ def generate_test_cluster_splits(
     task_splits.append(task_split)
 
   return task_splits
+
+
+# QwQ: except the clusters
+def generate_my_inter_ablation(
+    shot_config: ShotConfig = ShotConfig.ZERO) -> List[TaskSplit]:
+  """Ablation study on number of task clusters for training.(edited)"""
+
+  task_splits = []
+
+  # Up to 8 train clusters, ordered by number of tasks.
+  train_clusters_ordered = [
+      'summarization',
+      'reading_comprehension',
+      'sentiment',
+      'structure_to_text',
+      'coreference',
+      'conversational_qa',
+      'paraphrase',
+  ]
+  test_clusters_names = {'entailment', 'common_sense', 'open_domain_qa'}
+
+  for num_templates in flan_tasks.NUM_TEMPLATES_LIST:
+
+    all_task_clusters = _get_default_task_clusters(num_templates, shot_config)
+
+    test_clusters = {
+        k: v for k, v in all_task_clusters.items() if k in test_clusters_names
+    }
+    test_tasks = set()
+    for tasks in test_clusters.values():
+      test_tasks.update(tasks)
+
+    for num_train_clusters in _NUM_TRAIN_CLUSTERS_LIST:
+
+      # Get train tasks.
+      train_clusters = {
+          k: v
+          for k, v in all_task_clusters.items()
+          if k in train_clusters_ordered[:num_train_clusters]
+      }
+      largest_cluster_size = max([len(v) for v in train_clusters.values()])
+      train_tasks = []
+      for i in range(largest_cluster_size):
+        for tasks in train_clusters.values():
+          if len(tasks) > i:
+            train_tasks.append(tasks[i])
+
+      # Task split with num_train_clusters clusters.
+      task_split = TaskSplit(
+          name=f'flan_diversity_split{num_train_clusters}' +
+          f'_{num_templates}templates' + shot_config.name_suffix,
+          train_tasks=set(train_tasks),
+          test_tasks=test_tasks,
+          handle_overlap='error')
+
+      # Task split with num_train_clusters clusters, constant number of tasks.
+      limited_task_split = TaskSplit(
+          name=f'flan_diversity_split{num_train_clusters}' +
+          f'_{num_templates}templates' +
+          f'_{_LIMIT_NUM_TRAIN_TASKS}task_limit' + shot_config.name_suffix,
+          train_tasks=set(train_tasks[:_LIMIT_NUM_TRAIN_TASKS]),
+          test_tasks=test_tasks,
+          handle_overlap='error')
+
+      for split in [task_split, limited_task_split]:
+        task_splits.append(split)
+
+    # Hold number of clusters constant, vary number of tasks per cluster.
+    for tasks_per_cluster in _TASKS_PER_CLUSTER_LIST:
+
+      # Get train tasks.
+      train_clusters = {
+          k: v
+          for k, v in all_task_clusters.items()
+          if k in train_clusters_ordered[:num_train_clusters]
+      }
+      train_tasks = set()
+      for tasks in train_clusters.values():
+        train_tasks.update(tasks[:tasks_per_cluster])
+
+      # Add the task split.
+      task_split = TaskSplit(
+          name='flan_inter_split' + f'_{num_templates}templates' +
+          f'_{tasks_per_cluster}tpc'  # tpc = tasks_per_cluster
+          + shot_config.name_suffix,
+          train_tasks=train_tasks,
+          test_tasks=test_tasks,
+          handle_overlap='error')
+      task_splits.append(task_split)
+
+  return task_splits
