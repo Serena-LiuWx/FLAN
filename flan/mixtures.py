@@ -90,7 +90,7 @@ for split in all_splits:
             # The passthrough features let you track the source/task/template metadata for the example
             passthrough_features=["_template_idx", "_task_source", "_task_name", "_template", "_template_type"]
         )
-    except Exception e:
+    except Exception as e:
         print(e)
 
     selected_mixture = seqio.get_mixture_or_task(split.eval_mixture_name)
