@@ -81,14 +81,17 @@ for split in all_splits:
     TARGET_SEQ_LEN = 512
 
     selected_mixture = seqio.get_mixture_or_task(split.train_mixture_name)
-    dataset_train = selected_mixture.get_dataset(
-        sequence_length={"inputs": INPUT_SEQ_LEN, "targets": TARGET_SEQ_LEN},
-        num_epochs=1,
-        shuffle=True,
-        copy_pretokenized=True,
-        # The passthrough features let you track the source/task/template metadata for the example
-        passthrough_features=["_template_idx", "_task_source", "_task_name", "_template", "_template_type"]
-    )
+    try:
+        dataset_train = selected_mixture.get_dataset(
+            sequence_length={"inputs": INPUT_SEQ_LEN, "targets": TARGET_SEQ_LEN},
+            num_epochs=1,
+            shuffle=True,
+            copy_pretokenized=True,
+            # The passthrough features let you track the source/task/template metadata for the example
+            passthrough_features=["_template_idx", "_task_source", "_task_name", "_template", "_template_type"]
+        )
+    except Exception e:
+        print(e)
 
     selected_mixture = seqio.get_mixture_or_task(split.eval_mixture_name)
     dataset_eval = selected_mixture.get_dataset(
