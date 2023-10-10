@@ -918,6 +918,15 @@ def generate_my_inter_ablation(
 
   return task_splits
 
+# abbreviation for the clusters
+abbreviation_dict={
+  'reading_comprehension': 'rc',
+  'entailment': 'ent',
+  'summarization': 'sum',
+  'common_sense': 'cs',
+  'linguistic_acceptability':'la'
+}
+
 #QwQ: for exp 231007 A
 def generate_231007_inter_ablation(
     num_templates: int = 10,
@@ -926,9 +935,7 @@ def generate_231007_inter_ablation(
 
   task_splits = []
 
-  train_clusters_ordered = [
-      'reading_comprehension',
-  ]
+  train_clusters_names = {'reading_comprehension','linguistic_acceptability','summarization', 'common_sense'}
   test_clusters_names = {'entailment'}
 
   all_task_clusters = _get_default_task_clusters(num_templates, shot_config)
@@ -940,31 +947,40 @@ def generate_231007_inter_ablation(
   for tasks in test_clusters.values():
     test_tasks.update(tasks)
 
+  train_clusters = {
+      k: v for k, v in all_task_clusters.items() if k in train_clusters_names
+  }
+  train_tasks = set()
+  for tasks in train_clusters.values():
+    train_tasks.update(tasks)
+
   # for num_train_clusters in _NUM_TRAIN_CLUSTERS_LIST:
 
   # Get train tasks.
-  train_clusters = {
-      k: v
-      for k, v in all_task_clusters.items()
-      if k in train_clusters_ordered[:num_train_clusters]
-  }
-  largest_cluster_size = max([len(v) for v in train_clusters.values()])
-  train_tasks = []
-  for i in range(largest_cluster_size):
-    for tasks in train_clusters.values():
-      if len(tasks) > i:
-        train_tasks.append(tasks[i])
+  # train_clusters = {
+  #     k: v
+  #     for k, v in all_task_clusters.items()
+  #     if k in train_clusters_ordered[:num_train_clusters]
+  # }
+  # largest_cluster_size = max([len(v) for v in train_clusters.values()])
+  # train_tasks = []
+  # for i in range(largest_cluster_size):
+  #   for tasks in train_clusters.values():
+  #     if len(tasks) > i:
+  #       train_tasks.append(tasks[i])
 
   # Task split with num_train_clusters clusters.
-  task_split = TaskSplit(
-      name=f'flan_diversity_split{num_train_clusters}' +
-      f'_{num_templates}templates' + shot_config.name_suffix,
-      train_tasks=set(train_tasks),
-      test_tasks=test_tasks,
-      handle_overlap='error')
 
-  for split in task_split:
-    task_splits.append(split)
+  for train_cluster in train_clusters:
+    for test_cluster in test_clusters:
+      task_split = TaskSplit(
+          name='flan_diversity_split_'+abbreviation_dict[train_cluster]+'_'+abbreviation_dict[test_cluster]+f'_{num_templates}templates' + shot_config.name_suffix,
+          train_tasks=set(train_tasks),
+          test_tasks=test_tasks,
+          handle_overlap='error')
+      task_splits.append(task_split)
+
+  return task_splits
 '''
   # Hold number of clusters constant, vary number of tasks per cluster.
   for tasks_per_cluster in _TASKS_PER_CLUSTER_LIST:
@@ -989,4 +1005,4 @@ def generate_231007_inter_ablation(
         handle_overlap='error')
     task_splits.append(task_split)
 '''
-    return task_splits
+
