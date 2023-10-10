@@ -40,6 +40,7 @@ _TASKS_PER_CLUSTER_LIST = [1, 2, 3, 4]
 # Define task clusters using abbreviated task names. These abbreviated names
 # correspond to keys in templates.py:PATTERNS
 '''
+# original
 _DEFAULT_TASK_CLUSTERS_ABBREV = collections.OrderedDict([
     ('summarization', [
         'aeslc',
@@ -134,8 +135,8 @@ _DEFAULT_TASK_CLUSTERS_ABBREV = collections.OrderedDict([
         'cosmos_qa',
     ])
 ])
-'''
 
+# datasets available by tfds.load()
 _DEFAULT_TASK_CLUSTERS_ABBREV = collections.OrderedDict([
     ('summarization', [
         'cnn_dailymail',
@@ -182,6 +183,46 @@ _DEFAULT_TASK_CLUSTERS_ABBREV = collections.OrderedDict([
         'trec',
     ]), ('read_comp_and_common_sense', [
         'cosmos_qa',
+    ])
+])
+'''
+
+# those needed in 231007exp
+_DEFAULT_TASK_CLUSTERS_ABBREV = collections.OrderedDict([
+    ('summarization', [
+        'aeslc',
+        'cnn_dailymail',
+        'gigaword',
+        'multi_news',
+        'newsroom',
+        'samsum',
+        'xsum',
+        'ag_news_subset',
+        'opinion_abstracts_rotten_tomatoes',
+        'opinion_abstracts_idebate',
+        'wiki_lingua_english_en',
+    ]), 
+    ('reading_comprehension', [
+        'squad_v1',
+        'squad_v2',
+        'drop',
+        'multirc',
+        'openbookqa',
+        'bool_q',
+    ]), 
+    ('common_sense', [
+        'copa',
+        'hellaswag',
+        'story_cloze',
+        'piqa',
+    ]),
+    ('coreference', [
+        'definite_pronoun_resolution',
+        'winogrande',
+        'wsc',
+    ]), 
+    ('linguistic_acceptability', [
+        'cola',
     ])
 ])
 
