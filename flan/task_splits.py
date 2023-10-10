@@ -963,8 +963,8 @@ def generate_231007_inter_ablation(
       test_tasks=test_tasks,
       handle_overlap='error')
 
-  # for split in task_split:
-  #   task_splits.append(split)
+  for split in task_split:
+    task_splits.append(split)
 '''
   # Hold number of clusters constant, vary number of tasks per cluster.
   for tasks_per_cluster in _TASKS_PER_CLUSTER_LIST:
@@ -988,7 +988,5 @@ def generate_231007_inter_ablation(
         test_tasks=test_tasks,
         handle_overlap='error')
     task_splits.append(task_split)
-  return task_splits
 '''
-  return task_split
-  
+    return task_splits
