@@ -57,8 +57,8 @@ all_splits += task_splits.generate_inter_ablation(shot_config=shot_config)
 all_splits = task_splits.generate_test_cluster_splits()
 '''
 
-# Add my inter cluster splits.
-all_splits += task_splits.generate_my_inter_ablation(
+# Add 231007 inter cluster splits.
+all_splits += task_splits.generate_231007_inter_ablation(
     shot_config=shot_config)
 
 for split in all_splits:
