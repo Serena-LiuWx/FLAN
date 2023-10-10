@@ -216,13 +216,20 @@ _DEFAULT_TASK_CLUSTERS_ABBREV = collections.OrderedDict([
         'story_cloze',
         'piqa',
     ]),
-    ('coreference', [
-        'definite_pronoun_resolution',
-        'winogrande',
-        'wsc',
-    ]), 
     ('linguistic_acceptability', [
         'cola',
+    ]),
+    ('entailment', [
+        'anli_r1',
+        'anli_r2',
+        'anli_r3',
+        'cb',
+        'rte',
+        'mnli_matched',
+        'mnli_mismatched',
+        'qnli',
+        'wnli',
+        'snli',
     ])
 ])
 
