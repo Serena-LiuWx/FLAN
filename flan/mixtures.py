@@ -61,6 +61,8 @@ all_splits = task_splits.generate_test_cluster_splits()
 all_splits += task_splits.generate_231007_inter_ablation(
     shot_config=shot_config)
 
+print("All splits: ", all_splits)
+
 for split in all_splits:
   seqio.MixtureRegistry.add(
       name=split.train_mixture_name,
@@ -71,8 +73,10 @@ for split in all_splits:
       tasks=split.test_tasks,
       default_rate=seqio.mixing_rate_num_examples)
 
+print("All mixture names: ")
 for split in all_splits:
   print(split.train_mixture_name)
+  print(split.eval_mixture_name)
 
 
 # to get all the data from splits
