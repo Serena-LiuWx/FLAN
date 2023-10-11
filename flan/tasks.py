@@ -1828,7 +1828,7 @@ def _process_cola(example):
 
 TASK_CONFIGS['cola'] = _TaskConfig(
     source=seqio.TfdsDataSource(
-        tfds_name='glue/cola:1.0.0',
+        tfds_name='glue/cola:2.0.0',
         splits={
             'train': f'train[:-{NUM_VAL_EXAMPLES}]',
             'validation': f'train[-{NUM_VAL_EXAMPLES}:]',
