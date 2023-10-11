@@ -194,7 +194,6 @@ _DEFAULT_TASK_CLUSTERS_ABBREV = collections.OrderedDict([
         'cnn_dailymail',
         'gigaword',
         'multi_news',
-        'newsroom',
         'samsum',
         'xsum',
         'ag_news_subset',
